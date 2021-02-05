@@ -11,8 +11,7 @@ lazy val EasyWeb = RootProject(uri("git://github.com/scalahub/EasyWeb.git"))
 lazy val Kiosk = RootProject(uri("git://github.com/scalahub/Kiosk.git"))
 
 libraryDependencies ++= Seq(
-  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3",
-  "com.typesafe.akka" %% "akka-actor" % "2.4.+"
+  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
 )
 
 resolvers ++= Seq(
