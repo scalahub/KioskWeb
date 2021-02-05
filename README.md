@@ -1,5 +1,5 @@
 # KioskWeb
-[![Build Status](https://travis-ci.com/scalahub/KioskWeb.svg?branch=master)](https://travis-ci.com/scalahub/KioskWeb)
+[![Build Status](https://travis-ci.com/scalahub/KioskWeb.svg?branch=main)](https://travis-ci.com/scalahub/KioskWeb)
 
 A lightweight web-frontend wrapper over Kiosk
 
