@@ -10,17 +10,16 @@ import kiosk.tx.TxUtil
 import org.ergoplatform.appkit.InputBox
 import org.sh.easyweb.Text
 import org.sh.reflect.DataStructures.EasyMirrorSession
-import org.sh.reflect.DefaultTypeHandler
 import play.api.libs.json.{JsObject, Json, Writes}
 import sigmastate.Values.ErgoTree
-import special.sigma.GroupElement
 
 import scala.collection.mutable.{Map => MMap}
 
 // ToDo: Add context variable to each box created
 object KioskBoxCreator {
   EasyWebFormatters
-  private val sessionSecretBoxMap: MMap[String, (MMap[String, KioskBox], MMap[String, DhtData])] = MMap()
+  private val sessionSecretBoxMap
+      : MMap[String, (MMap[String, KioskBox], MMap[String, DhtData])] = MMap()
 
   private def boxMap(
       sessionSecret: Option[String]
@@ -39,11 +38,14 @@ object KioskBoxCreator {
 
   case class Named[T](name: String, t: T)(implicit val writesT: Writes[T]) {
     implicit val writesNamedT = Json.writes[Named[T]]
-    override def toString = Json.prettyPrint(Json.obj("name" -> name) ++ Json.toJson(t).as[JsObject])
+    override def toString =
+      Json.prettyPrint(Json.obj("name" -> name) ++ Json.toJson(t).as[JsObject])
   }
 }
 
-class KioskBoxCreator(val $ergoScript: KioskScriptCreator) extends EasyMirrorSession {
+class KioskBoxCreator(val $ergoScript: KioskScriptCreator)
+    extends EasyMirrorSession {
+  import EasyWebFormatters._
   import KioskBoxCreator._
 
   private val boxesDhts = boxMap($ergoScript.$env.$sessionSecret)
@@ -56,7 +58,14 @@ class KioskBoxCreator(val $ergoScript: KioskScriptCreator) extends EasyMirrorSes
     }.toArray
   }
 
-  def createBoxFromScript(boxName: String, script: Text, registerKeys: Array[String], tokenIDs: Array[String], tokenAmts: Array[Long], value: Long) = {
+  def createBoxFromScript(
+      boxName: String,
+      script: Text,
+      registerKeys: Array[String],
+      tokenIDs: Array[String],
+      tokenAmts: Array[Long],
+      value: Long
+  ) = {
     val $INFO$ =
       """
 1. Number of elements in the arrays tokenIDs and tokenAmts must be same. If you don't want to use tokens, set these array to empty (i.e., [])
@@ -73,7 +82,14 @@ Let the keys for the Int and Coll[Byte] be, say, a and b respectively. Then set 
     create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value)
   }
 
-  def createBoxFromAddress(boxName: String, address: String, registerKeys: Array[String], tokenIDs: Array[String], tokenAmts: Array[Long], value: Long) = {
+  def createBoxFromAddress(
+      boxName: String,
+      address: String,
+      registerKeys: Array[String],
+      tokenIDs: Array[String],
+      tokenAmts: Array[Long],
+      value: Long
+  ) = {
     val $boxName$ = "myFirstBox"
     val $value$ = "123456"
     val $address$ = s"""4MQyML64GnzMxZgm"""
@@ -89,7 +105,14 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value)
   }
 
-  private def create(boxName: String, ergoTree: ErgoTree, registerKeys: Array[String], tokenIDs: Array[String], tokenAmts: Array[Long], value: Long) = {
+  private def create(
+      boxName: String,
+      ergoTree: ErgoTree,
+      registerKeys: Array[String],
+      tokenIDs: Array[String],
+      tokenAmts: Array[Long],
+      value: Long
+  ) = {
     if (boxes.contains(boxName))
       throw new Exception(s"Name $boxName already exists. Use a different name")
     require(
@@ -99,8 +122,7 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     val availableKeys =
       $ergoScript.$env.$envMap.keys.foldLeft("")(_ + " " + _)
     val registers = registerKeys.map { key =>
-      val value: KioskType[_] = $ergoScript.$env.$envMap
-        .get(key)
+      val value: KioskType[_] = $ergoScript.$env.$envMap.get(key)
         .getOrElse(
           throw new Exception(
             s"Key $key not found in environment. Available keys [$availableKeys]"
@@ -133,7 +155,14 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     }
   }
 
-  def dhtDataAdd(name: String, g: String, h: String, u: String, v: String, x: BigInt): Unit = {
+  def dhtDataAdd(
+      name: String,
+      g: String,
+      h: String,
+      u: String,
+      v: String,
+      x: BigInt
+  ): Unit = {
     val $name$ = "dht1"
     val $g$ =
       "028182257d34ec7dbfedee9e857aadeb8ce02bb0c757871871cff378bb52107c67"
@@ -149,10 +178,9 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
       ScalaErgoConverters.stringToGroupElement(s)
     dhts
       .get(name)
-      .fold(dhts += (name -> DhtData(g, h, u, v, x)))(
-        _ =>
-          throw new Exception(
-            s"DHTuple ${name} is already defined. Use a different name"
+      .fold(dhts += (name -> DhtData(g, h, u, v, x)))(_ =>
+        throw new Exception(
+          s"DHTuple ${name} is already defined. Use a different name"
         )
       )
 
@@ -176,20 +204,35 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     }.toArray
   }
 
-  def createTx(inputBoxIds: Array[String],
-               dataInputBoxIds: Array[String],
-               outputBoxNames: Array[String],
-               fee: Long,
-               changeAddress: String,
-               proveDlogSecrets: Array[String],
-               proveDhtDataNames: Array[String],
-               broadcast: Boolean) = {
+  def createTx(
+      inputBoxIds: Array[String],
+      dataInputBoxIds: Array[String],
+      outputBoxNames: Array[String],
+      fee: Long,
+      changeAddress: String,
+      proveDlogSecrets: Array[String],
+      proveDhtDataNames: Array[String],
+      broadcast: Boolean
+  ) = {
     val dhtData: Array[DhtData] = proveDhtDataNames.map(dhts(_))
-    val boxesToCreate: Array[KioskBox] = outputBoxNames.map(outputBoxName => boxes(outputBoxName))
+    val boxesToCreate: Array[KioskBox] =
+      outputBoxNames.map(outputBoxName => boxes(outputBoxName))
     Client.usingContext { implicit ctx =>
       val inputBoxes: Array[InputBox] = ctx.getBoxesById(inputBoxIds: _*)
-      val dataInputBoxes: Array[InputBox] = ctx.getBoxesById(dataInputBoxIds: _*)
-      TxUtil.createTx(inputBoxes, dataInputBoxes, boxesToCreate, fee, changeAddress, proveDlogSecrets, dhtData, broadcast).toJson(false)
+      val dataInputBoxes: Array[InputBox] =
+        ctx.getBoxesById(dataInputBoxIds: _*)
+      TxUtil
+        .createTx(
+          inputBoxes,
+          dataInputBoxes,
+          boxesToCreate,
+          fee,
+          changeAddress,
+          proveDlogSecrets,
+          dhtData,
+          broadcast
+        )
+        .toJson(false)
     }
   }
 
