@@ -1,5 +1,6 @@
 package kiosk.box
 
+import kiosk.EasyWebFormatters
 import kiosk.appkit.Client
 import kiosk.encoding.ScalaErgoConverters
 import kiosk.encoding.ScalaErgoConverters._
@@ -18,9 +19,7 @@ import scala.collection.mutable.{Map => MMap}
 
 // ToDo: Add context variable to each box created
 object KioskBoxCreator {
-  DefaultTypeHandler.addType[GroupElement](classOf[GroupElement], stringToGroupElement, groupElementToString)
-  DefaultTypeHandler.addType[ErgoTree](classOf[ErgoTree], stringToErgoTree, ergoTreeToString)
-
+  EasyWebFormatters
   private val sessionSecretBoxMap: MMap[String, (MMap[String, KioskBox], MMap[String, DhtData])] = MMap()
 
   private def boxMap(
