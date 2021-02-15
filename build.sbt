@@ -20,11 +20,13 @@ resolvers ++= Seq(
   "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 )
 
+cleanFiles += baseDirectory.value / "src/main/webapp"
+
 lazy val root = (project in file("."))
   .dependsOn(EasyWeb, JDE)
   .settings(
     updateOptions := updateOptions.value.withLatestSnapshots(false),
-    mainClass in (Compile, run) := Some("kiosk.KioskWeb"),
+    mainClass in (Compile, run) := Some("kiosk.CodeGen"),
     assemblyMergeStrategy in assembly := {
       case PathList("reference.conf")    => MergeStrategy.concat
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard

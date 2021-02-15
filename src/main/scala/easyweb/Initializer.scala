@@ -14,13 +14,8 @@ Stacktrace of the call is given below:
 org.sh.reflect.CodeGenUtil$:CodeGenUtil.scala:69
 org.sh.easyweb.AutoWebSession:AutoWebSession.scala:22
 org.sh.easyweb.AutoWebSession:AutoWebSession.scala:141
-kiosk.KioskWeb$:KioskWeb.scala:37
-kiosk.KioskWeb$delayedInit$body:KioskWeb.scala:12
-scala.Function0:Function0.scala:39
-scala.Function0:Function0.scala:39
-scala.runtime.AbstractFunction0:AbstractFunction0.scala:17
-scala.App:App.scala:80
-scala.collection.immutable.List:List.scala:392
+kiosk.CodeGen$:CodeGen.scala:38
+kiosk.CodeGen:CodeGen.scala:-1
 
 */
 package easyweb {

@@ -9,8 +9,8 @@ object Script extends KioskScriptCreator(Env)
 object Box extends KioskBoxCreator(Script)
 object Wallet extends KioskWallet(Box)
 
-object KioskWeb extends App {
-  org.sh.reflect.Util.debug = true
+object CodeGen {
+  org.sh.reflect.Util.debug = true // set false to prevent debug info
 
   val appInfo =
     """This is front-end for Kiosk, which is a library for interacting with the Ergo blockchain.
@@ -34,5 +34,6 @@ object KioskWeb extends App {
     Wallet,
     ErgoUtil
   )
-  new org.sh.easyweb.AutoWebSession(objects, appInfo).generateWebXml
+  lazy val autoWebSession = new org.sh.easyweb.AutoWebSession(objects, appInfo)
+  def main(args: Array[String]): Unit = autoWebSession.generateWebXml
 }
