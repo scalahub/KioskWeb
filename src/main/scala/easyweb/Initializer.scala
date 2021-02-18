@@ -16,6 +16,11 @@ org.sh.easyweb.AutoWebSession:AutoWebSession.scala:22
 org.sh.easyweb.AutoWebSession:AutoWebSession.scala:141
 kiosk.CodeGen$:CodeGen.scala:38
 kiosk.CodeGen:CodeGen.scala:-1
+sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:-2
+sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:62
+sun.reflect.DelegatingMethodAccessorImpl:DelegatingMethodAccessorImpl.java:43
+java.lang.reflect.Method:Method.java:498
+sbt.Run:Run.scala:98
 
 */
 package easyweb {

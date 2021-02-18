@@ -12,6 +12,7 @@ import org.ergoplatform.ErgoAddressEncoder
 import org.ergoplatform.appkit.{ConstantsBuilder, InputBox}
 import org.sh.easyweb.Text
 import org.sh.reflect.DataStructures.EasyMirrorSession
+import play.api.libs.json.{JsValue, Json}
 import scorex.crypto.hash.Blake2b256
 import sigmastate.eval._
 import sigmastate.interpreter.CryptoConstants
@@ -150,38 +151,49 @@ The wallet does not currently support proveDlog secrets."""
     }
 
     val compileResults = compiler.compile(Parser.parse(script.getText))
-    val feeNanoErgs = compileResults.fee.getOrElse(defaultFee)
-    val outputNanoErgs = compileResults.outputs.map(_.value).sum + feeNanoErgs
-    val deficientNanoErgs =
-      (outputNanoErgs - compileResults.inputNanoErgs).max(0)
+    val txJson: JsValue = if (compileResults.outputs.nonEmpty) {
+      try {
+        val feeNanoErgs = compileResults.fee.getOrElse(defaultFee)
+        val outputNanoErgs = compileResults.outputs.map(_.value).sum + feeNanoErgs
+        val deficientNanoErgs =
+          (outputNanoErgs - compileResults.inputNanoErgs).max(0)
 
-    /* Currently we are not going to look for deficient tokens, just nanoErgs */
-    val moreInputBoxIds = if (deficientNanoErgs > 0) {
-      val myBoxes: Seq[ergo.KioskBox] = explorer
-        .getUnspentBoxes(myAddress)
-        .filterNot(compileResults.inputBoxIds.contains)
-        .sortBy(-_.value)
-      boxSelector(deficientNanoErgs, myBoxes)
-    } else Nil
-    val inputBoxIds = compileResults.inputBoxIds ++ moreInputBoxIds
-    Client.usingContext { implicit ctx =>
-      val inputBoxes: Array[InputBox] = ctx.getBoxesById(inputBoxIds: _*)
-      val dataInputBoxes: Array[InputBox] =
-        ctx.getBoxesById(compileResults.dataInputBoxIds: _*)
-      TxUtil
-        .createTx(
-          inputBoxes = inputBoxes,
-          dataInputs = dataInputBoxes,
-          boxesToCreate = compileResults.outputs.toArray,
-          fee = feeNanoErgs,
-          changeAddress = myAddress,
-          proveDlogSecrets =
-            Array(secretKey.toString(10)) ++ additionalBigIntSecrets,
-          dhtData = Array[DhtData](),
-          broadcast = broadcast
-        )
-        .toJson(false)
-    }
+        /* Currently we are not going to look for deficient tokens, just nanoErgs */
+        val moreInputBoxIds = if (deficientNanoErgs > 0) {
+          val myBoxes: Seq[ergo.KioskBox] = explorer
+            .getUnspentBoxes(myAddress)
+            .filterNot(compileResults.inputBoxIds.contains)
+            .sortBy(-_.value)
+          boxSelector(deficientNanoErgs, myBoxes)
+        } else Nil
+        val inputBoxIds = compileResults.inputBoxIds ++ moreInputBoxIds
+        val txString = Client.usingContext { implicit ctx =>
+          val inputBoxes: Array[InputBox] = ctx.getBoxesById(inputBoxIds: _*)
+          val dataInputBoxes: Array[InputBox] =
+            ctx.getBoxesById(compileResults.dataInputBoxIds: _*)
+          TxUtil
+            .createTx(
+              inputBoxes = inputBoxes,
+              dataInputs = dataInputBoxes,
+              boxesToCreate = compileResults.outputs.toArray,
+              fee = feeNanoErgs,
+              changeAddress = myAddress,
+              proveDlogSecrets =
+                Array(secretKey.toString(10)) ++ additionalBigIntSecrets,
+              dhtData = Array[DhtData](),
+              broadcast = broadcast
+            )
+            .toJson(false)
+        }
+        Json.parse(txString)
+      } catch {
+        case throwable: Throwable => Json.obj("error" -> throwable.getMessage)
+      }
+      // only reading data
+    } else Json.obj()
+    import Parser._
+    val returnJson: JsValue = Json.toJson(compileResults.returned)
+    Json.obj("tx" -> txJson, "returned" -> returnJson)
   }
 
   override def $setSession(sessionSecret: Option[String]): KioskWallet =

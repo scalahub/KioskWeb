@@ -15,6 +15,12 @@ org.sh.reflect.CodeGenUtil$:CodeGenUtil.scala:69
 org.sh.easyweb.AutoWebSession:AutoWebSession.scala:84
 kiosk.CodeGen$:CodeGen.scala:38
 kiosk.CodeGen:CodeGen.scala:-1
+sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:-2
+sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:62
+sun.reflect.DelegatingMethodAccessorImpl:DelegatingMethodAccessorImpl.java:43
+java.lang.reflect.Method:Method.java:498
+sbt.Run:Run.scala:98
+sbt.Run:Run.scala:92
 
 -->
 <web-app

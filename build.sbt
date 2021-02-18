@@ -20,8 +20,6 @@ resolvers ++= Seq(
   "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 )
 
-cleanFiles += baseDirectory.value / "src/main/webapp"
-
 lazy val root = (project in file("."))
   .dependsOn(EasyWeb, JDE)
   .settings(
