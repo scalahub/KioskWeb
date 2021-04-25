@@ -192,8 +192,9 @@ The wallet does not currently support proveDlog secrets."""
       // only reading data
     } else Json.obj()
     import Parser._
-    val returnJson: JsValue = Json.toJson(compileResults.returned)
-    Json.obj("tx" -> txJson, "returned" -> returnJson)
+    //    val returnJson: JsValue = Json.toJson(compileResults.returned)
+    //    Json.obj("tx" -> txJson, "returned" -> returnJson)
+    Json.obj("tx" -> txJson, "compiled" -> compileResults)
   }
 
   override def $setSession(sessionSecret: Option[String]): KioskWallet =
