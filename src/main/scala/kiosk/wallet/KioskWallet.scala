@@ -6,7 +6,7 @@ import kiosk.tx.TxUtil
 import kiosk.ergo
 import kiosk.ergo.{Amount, DhtData, ID, KioskBigInt}
 import kiosk.explorer.Explorer
-import jde.compiler.TxBuilder
+import jde.compiler.{Compiler => TxBuilder}
 import jde.parser.Parser
 import org.ergoplatform.ErgoAddressEncoder
 import org.ergoplatform.appkit.{ConstantsBuilder, InputBox}
@@ -192,8 +192,6 @@ The wallet does not currently support proveDlog secrets."""
       // only reading data
     } else Json.obj()
     import Parser._
-    //    val returnJson: JsValue = Json.toJson(compileResults.returned)
-    //    Json.obj("tx" -> txJson, "returned" -> returnJson)
     Json.obj("tx" -> txJson, "compiled" -> compileResults)
   }
 
