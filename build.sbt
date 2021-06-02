@@ -7,8 +7,7 @@ updateOptions := updateOptions.value.withLatestSnapshots(false)
 scalaVersion := "2.12.10"
 
 lazy val EasyWeb = RootProject(uri("git://github.com/scalahub/EasyWeb.git"))
-
-lazy val ErgoJde = RootProject(uri("git://github.com/ergoplatform/ergo-jde.git"))
+lazy val ErgoJde = ProjectRef(uri("git://github.com/ergoplatform/ergo-jde.git"), "jde")
 
 libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
