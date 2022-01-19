@@ -46,6 +46,12 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
     $addIfNotExist(name, KioskCollGroupElement(groupElements))
   }
 
+  def setAvlTree(name: String, digest: Array[Byte], keyLen: Int, optValueLen: Option[String]): Unit = {
+    val $optValueLen$ = ""
+    val $keyLen$ = "32"
+    $addIfNotExist(name, KioskAvlTree(digest, keyLen, optValueLen.map(_.toInt)))
+  }
+
   def decodeValue(hex: String) = {
     val kioskType = ScalaErgoConverters.deserialize(hex)
     s"${kioskType.typeName}: ${kioskType.toString}"
@@ -77,8 +83,7 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
   }
 
   def $addIfNotExist(name: String, kioskType: KioskType[_]) = {
-    $envMap
-      .get(name)
+    $envMap.get(name)
       .fold(
         $envMap += name -> kioskType
       )(_ => throw new Exception(s"Variable $name is already defined"))
@@ -101,14 +106,15 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
     }
   }
 
-  def getAll(serialize: Boolean): Array[String] = $envMap.toArray.map {
-    case (key, kioskType) =>
-      val value = if (serialize) kioskType.serialize.encodeHex else kioskType.toString
-      new JsonFormatted {
-        override val keys: Array[String] = Array("name", "value", "type")
-        override val vals: Array[Any] = Array(key, value, kioskType.typeName)
-      }.toString
-  }
+  def getAll(serialize: Boolean): Array[String] =
+    $envMap.toArray.map {
+      case (key, kioskType) =>
+        val value = if (serialize) kioskType.serialize.encodeHex else kioskType.toString
+        new JsonFormatted {
+          override val keys: Array[String] = Array("name", "value", "type")
+          override val vals: Array[Any] = Array(key, value, kioskType.typeName)
+        }.toString
+    }
 
   def $getEnv: MMap[String, Any] = {
     $envMap.map { case (key, kioskType) => key -> kioskType.value }
