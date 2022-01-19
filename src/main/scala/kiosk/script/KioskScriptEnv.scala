@@ -47,7 +47,8 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
   }
 
   def setAvlTree(name: String, digest: Array[Byte], keyLen: Int, optValueLen: Option[String]): Unit = {
-    val $optValueLen$ = ""
+    val $name$ = "myAvlTree"
+    val $optValueLen$ = "10"
     val $keyLen$ = "32"
     $addIfNotExist(name, KioskAvlTree(digest, keyLen, optValueLen.map(_.toInt)))
   }
