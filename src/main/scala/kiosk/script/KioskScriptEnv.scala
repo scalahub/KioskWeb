@@ -65,6 +65,12 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
     $addIfNotExist(name, KioskBigInt(decodeBigInt(bigInt)))
   }
 
+  def setBoolean(name: String, boolean: Boolean): Unit = {
+    val $name$ = "myBoolean"
+    val $boolean$ = "true"
+    $addIfNotExist(name, KioskBoolean(boolean))
+  }
+
   def setLong(name: String, long: Long): Unit = {
     val $name$ = "myLong"
     val $long$ = "12345678901112"
