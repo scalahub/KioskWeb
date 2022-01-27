@@ -75,7 +75,8 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
       Array(),
       Array(),
       Array(),
-      nanoErgs
+      nanoErgs,
+      None
     )
     val inputs: Seq[String] = boxSelector(nanoErgs + defaultFee, unspentBoxes)
     val txJson = $ergoBox.createTx(
@@ -86,6 +87,7 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
       changeAddress = myAddress,
       proveDlogSecrets = Array(secretKey.toString(10)),
       proveDhtDataNames = Array(),
+      useContextVars = false,
       broadcast = true
     )
     $ergoBox.deleteBox(boxName)

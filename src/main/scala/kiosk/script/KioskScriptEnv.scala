@@ -8,16 +8,16 @@ import org.sh.utils.json.JSONUtil.JsonFormatted
 import scala.collection.mutable.{Map => MMap}
 
 object KioskScriptEnv {
-  private val sessionSecretEnvMap: MMap[String, MMap[String, KioskType[_]]] = MMap()
+  private val sessionSecretEnvMap: MMap[String, (MMap[String, KioskType[_]], MMap[(Int, Byte), String])] = MMap()
 
-  private def getEnvMap(sessionSecret: Option[String]): MMap[String, KioskType[_]] = {
+  private def getEnvMap(sessionSecret: Option[String]): (MMap[String, KioskType[_]], MMap[(Int, Byte), String]) = {
     sessionSecret match {
-      case None => MMap()
+      case None => (MMap(), MMap())
       case Some(secret) =>
         sessionSecretEnvMap.get(secret) match {
-          case Some(map) => map
+          case Some((mapEnv, mapContextVar)) => (mapEnv, mapContextVar)
           case _ =>
-            sessionSecretEnvMap += secret -> MMap()
+            sessionSecretEnvMap += secret -> (MMap(), MMap())
             sessionSecretEnvMap(secret)
         }
     }
@@ -28,7 +28,9 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
   import KioskScriptEnv._
 
   // Any variable starting with '$' is hidden from the auto-generated frontend of EasyWeb
-  val $envMap: MMap[String, KioskType[_]] = getEnvMap($sessionSecret)
+  private lazy val $envContextMaps: (MMap[String, KioskType[_]], MMap[(Int, Byte), String]) = getEnvMap($sessionSecret)
+  val $envMap = $envContextMaps._1
+  val $contextVarMap = $envContextMaps._2
 
   def setGroupElement(name: String, groupElement: String): Unit = {
     val $INFO$ = "A group element is encoded as a public key of Bitcoin in hex (compressed or uncompressed)"
@@ -87,6 +89,17 @@ class KioskScriptEnv(val $sessionSecret: Option[String] = None) extends EasyMirr
     val $name$ = "myCollByte"
     val $bytes$ = "0x1a2b3c4d5e6f"
     $addIfNotExist(name, KioskCollByte(bytes))
+  }
+
+  def addContextVar(inputNumber: Int, contextVarId: Int, envVar: String, overwrite: Boolean) = {
+    val $INFO$ = "ContextVarId must be a Int that can be converted to a Byte"
+    val $overwrite$ = "false"
+    val contextVarIdByte = contextVarId.toByte
+    val key = (inputNumber, contextVarIdByte)
+    $contextVarMap.get(key) match {
+      case _ if overwrite => $contextVarMap += key -> envVar
+      case Some(envVar)   => throw new Exception(s"Context var $key already map to var $envVar and overwrite is false")
+    }
   }
 
   def $addIfNotExist(name: String, kioskType: KioskType[_]) = {

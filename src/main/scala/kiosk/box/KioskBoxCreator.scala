@@ -7,7 +7,7 @@ import kiosk.encoding.ScalaErgoConverters._
 import kiosk.ergo._
 import kiosk.script.KioskScriptCreator
 import kiosk.tx.TxUtil
-import org.ergoplatform.appkit.InputBox
+import org.ergoplatform.appkit.{ContextVar, InputBox}
 import org.sh.easyweb.Text
 import org.sh.reflect.DataStructures.EasyMirrorSession
 import play.api.libs.json.{JsObject, Json, Writes}
@@ -15,11 +15,10 @@ import sigmastate.Values.ErgoTree
 
 import scala.collection.mutable.{Map => MMap}
 
-// ToDo: Add context variable to each box created
+// ToDo: Add context variable to each input
 object KioskBoxCreator {
   EasyWebFormatters
-  private val sessionSecretBoxMap
-      : MMap[String, (MMap[String, KioskBox], MMap[String, DhtData])] = MMap()
+  private val sessionSecretBoxMap: MMap[String, (MMap[String, KioskBox], MMap[String, DhtData])] = MMap()
 
   private def boxMap(
       sessionSecret: Option[String]
@@ -43,8 +42,7 @@ object KioskBoxCreator {
   }
 }
 
-class KioskBoxCreator(val $ergoScript: KioskScriptCreator)
-    extends EasyMirrorSession {
+class KioskBoxCreator(val $ergoScript: KioskScriptCreator) extends EasyMirrorSession {
   import EasyWebFormatters._
   import KioskBoxCreator._
 
@@ -64,7 +62,8 @@ class KioskBoxCreator(val $ergoScript: KioskScriptCreator)
       registerKeys: Array[String],
       tokenIDs: Array[String],
       tokenAmts: Array[Long],
-      value: Long
+      value: Long,
+      creationHeight: Option[String]
   ) = {
     val $INFO$ =
       """
@@ -79,7 +78,7 @@ Let the keys for the Int and Coll[Byte] be, say, a and b respectively. Then set 
   sigmaProp(1 < 2)
 }"""
     val ergoTree = $ergoScript.$compile(script.getText)
-    create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value)
+    create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value, creationHeight.map(_.toInt))
   }
 
   def createBoxFromAddress(
@@ -88,7 +87,8 @@ Let the keys for the Int and Coll[Byte] be, say, a and b respectively. Then set 
       registerKeys: Array[String],
       tokenIDs: Array[String],
       tokenAmts: Array[Long],
-      value: Long
+      value: Long,
+      creationHeight: Option[String]
   ) = {
     val $boxName$ = "myFirstBox"
     val $value$ = "123456"
@@ -102,7 +102,7 @@ As an example, to set R4 to Int 1 and R5 to Coll[Byte] 0x1234567890abcdef, first
 Let the keys for the Int and Coll[Byte] be, say, a and b respectively. Then set registerKeys value as [a,b]
 The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     val ergoTree = getAddressFromString(address).script
-    create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value)
+    create(boxName, ergoTree, registerKeys, tokenIDs, tokenAmts, value, creationHeight.map(_.toInt))
   }
 
   private def create(
@@ -111,7 +111,8 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
       registerKeys: Array[String],
       tokenIDs: Array[String],
       tokenAmts: Array[Long],
-      value: Long
+      value: Long,
+      optCreationHeight: Option[Int] = None
   ) = {
     if (boxes.contains(boxName))
       throw new Exception(s"Name $boxName already exists. Use a different name")
@@ -133,7 +134,7 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
     val tokens: Tokens = tokenIDs zip tokenAmts
     val address = getStringFromAddress(getAddressFromErgoTree(ergoTree))
     val box = KioskBox(address, value, registers, tokens)
-    boxes += (boxName -> KioskBox(address, value, registers, tokens))
+    boxes += (boxName -> KioskBox(address, value, registers, tokens, creationHeight = optCreationHeight))
     box
   }
 
@@ -212,13 +213,44 @@ The default address 4MQyML64GnzMxZgm corresponds to the script {1 < 2}"""
       changeAddress: String,
       proveDlogSecrets: Array[String],
       proveDhtDataNames: Array[String],
+      useContextVars: Boolean,
       broadcast: Boolean
   ) = {
+    val allContextVars: Map[Int, Seq[(Int, (Byte, KioskType[_]))]] = {
+      if (useContextVars) {
+        $ergoScript.$env.$contextVarMap.toSeq.map {
+          case ((inputNum, byte), envVar) if inputBoxIds.size > inputNum =>
+            $ergoScript.$env.$envMap.get(envVar) match {
+              case None            => throw new Exception(s"No env variable called $envVar found")
+              case Some(kioskType) => inputNum -> (byte, kioskType)
+            }
+          case ((inputNum, byte), _) => throw new Exception(s"Input $inputNum not found when attaching context var $byte")
+        }
+      } else Nil
+    }.groupBy(_._1)
+
     val dhtData: Array[DhtData] = proveDhtDataNames.map(dhts(_))
     val boxesToCreate: Array[KioskBox] =
       outputBoxNames.map(outputBoxName => boxes(outputBoxName))
     Client.usingContext { implicit ctx =>
-      val inputBoxes: Array[InputBox] = ctx.getBoxesById(inputBoxIds: _*)
+      val inputBoxes: Array[InputBox] = ctx.getBoxesById(inputBoxIds: _*).zipWithIndex.map {
+        case (box, index) =>
+          allContextVars.get(index) match {
+            case Some(seq) =>
+              try {
+                val contextVars = seq.map {
+                  case (_, (byte, kioskType)) =>
+                    new ContextVar(byte, kioskType.getErgoValue)
+                }
+                box.withContextVars(contextVars: _*)
+              } catch {
+                case e: Throwable =>
+                  e.printStackTrace()
+                  ???
+              }
+            case _ => box
+          }
+      }
       val dataInputBoxes: Array[InputBox] =
         ctx.getBoxesById(dataInputBoxIds: _*)
       TxUtil
