@@ -4,14 +4,14 @@ scalaVersion := "2.12.10"
 
 libraryDependencies ++= Seq(
   "io.github.ergoplatform" %% "jde" % "0.1.0-SNAPSHOT",
-  "io.github.scalahub" %% "auto_web" % "0.1.0-SNAPSHOT", // EasyWeb
+  "io.github.scalahub" %% "easyweb" % "0.1.0-SNAPSHOT", // EasyWeb
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
 )
 
 resolvers ++= Seq(
   "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",
   "SonaType" at "https://oss.sonatype.org/content/groups/public",
-  "SonaType Snapshots s01" at "https://s01.oss.sonatype.org/content/repositories/snapshots/",
+  "SonaType Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots/",
   "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 )
 
