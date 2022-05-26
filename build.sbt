@@ -1,15 +1,10 @@
 name := "KioskWeb"
 
-version := "0.1"
-
-updateOptions := updateOptions.value.withLatestSnapshots(false)
-
 scalaVersion := "2.12.10"
-
-lazy val EasyWeb = RootProject(uri("git://github.com/scalahub/EasyWeb.git"))
 
 libraryDependencies ++= Seq(
   "io.github.ergoplatform" %% "jde" % "0.1.0-SNAPSHOT",
+  "io.github.scalahub" %% "auto_web" % "0.1.0-SNAPSHOT", // EasyWeb
   "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
 )
 
@@ -21,7 +16,6 @@ resolvers ++= Seq(
 )
 
 lazy val root = (project in file("."))
-  .dependsOn(EasyWeb)
   .settings(
     updateOptions := updateOptions.value.withLatestSnapshots(false),
     mainClass in (Compile, run) := Some("kiosk.CodeGen"),
