@@ -2,21 +2,20 @@ name := "KioskWeb"
 
 scalaVersion := "2.12.10"
 
-libraryDependencies ++= Seq(
-  "io.github.ergoplatform" %% "jde" % "0.1.0-SNAPSHOT",
-  "io.github.scalahub" %% "easyweb" % "0.1.0-SNAPSHOT", // EasyWeb
-  "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
-)
-
-resolvers ++= Seq(
-  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",
-  "SonaType" at "https://oss.sonatype.org/content/groups/public",
-  "SonaType Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots/",
-  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-)
-
 lazy val root = (project in file("."))
   .settings(
+    resolvers ++= Seq(
+      "Sonatype Releases" at "https://s01.oss.sonatype.org/content/repositories/releases",
+      "Sonatype Releases 2" at "https://oss.sonatype.org/content/repositories/releases/",
+      "SonaType" at "https://oss.sonatype.org/content/groups/public",
+      "SonaType Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots/",
+      "SonaType Staging" at "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+    ),
+    libraryDependencies ++= Seq(
+      "io.github.ergoplatform" %% "jde" % "1.0",
+      "io.github.scalahub" %% "easyweb" % "1.0", // EasyWeb
+      "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
+    ),
     updateOptions := updateOptions.value.withLatestSnapshots(false),
     mainClass in (Compile, run) := Some("kiosk.CodeGen"),
     assemblyMergeStrategy in assembly := {
