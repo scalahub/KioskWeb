@@ -12,15 +12,9 @@ Class that generated this code: org.sh.easyweb.AutoWebSession
 Stacktrace of the call is given below:
 
 org.sh.reflect.CodeGenUtil$:CodeGenUtil.scala:69
-org.sh.easyweb.AutoWebSession:AutoWebSession.scala:84
+org.sh.easyweb.AutoWebSession:AutoWebSession.scala:92
 kiosk.CodeGen$:CodeGen.scala:38
 kiosk.CodeGen:CodeGen.scala:-1
-sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:-2
-sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:62
-sun.reflect.DelegatingMethodAccessorImpl:DelegatingMethodAccessorImpl.java:43
-java.lang.reflect.Method:Method.java:498
-sbt.Run:Run.scala:98
-sbt.Run:Run.scala:92
 
 -->
 <web-app
@@ -53,6 +47,10 @@ sbt.Run:Run.scala:92
         <servlet-name>DownloadServlet</servlet-name>
         <servlet-class>org.sh.easyweb.server.FileDownloaderNIO</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PingServlet</servlet-name>
+        <servlet-class>org.sh.easyweb.server.PingServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>QueryServlet</servlet-name>
         <url-pattern>/post</url-pattern>
@@ -67,10 +65,12 @@ sbt.Run:Run.scala:92
         <url-pattern>/session</url-pattern>
         <url-pattern></url-pattern>
     </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>DownloadServlet</servlet-name>
         <url-pattern>/download</url-pattern>
     </servlet-mapping>
-
+    <servlet-mapping>
+        <servlet-name>PingServlet</servlet-name>
+        <url-pattern>/ping</url-pattern>
+    </servlet-mapping>         
 </web-app>

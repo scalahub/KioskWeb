@@ -12,15 +12,10 @@ Class that generated this code: org.sh.easyweb.AutoWebSession
 Stacktrace of the call is given below:
 
 org.sh.reflect.CodeGenUtil$:CodeGenUtil.scala:69
-org.sh.easyweb.AutoWebSession:AutoWebSession.scala:22
-org.sh.easyweb.AutoWebSession:AutoWebSession.scala:141
+org.sh.easyweb.AutoWebSession:AutoWebSession.scala:26
+org.sh.easyweb.AutoWebSession:AutoWebSession.scala:155
 kiosk.CodeGen$:CodeGen.scala:38
 kiosk.CodeGen:CodeGen.scala:-1
-sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:-2
-sun.reflect.NativeMethodAccessorImpl:NativeMethodAccessorImpl.java:62
-sun.reflect.DelegatingMethodAccessorImpl:DelegatingMethodAccessorImpl.java:43
-java.lang.reflect.Method:Method.java:498
-sbt.Run:Run.scala:98
 
 */
 package easyweb {

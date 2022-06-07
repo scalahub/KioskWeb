@@ -15,7 +15,7 @@ lazy val root = (project in file("."))
     ),
     libraryDependencies ++= Seq(
       "io.github.ergoplatform" %% "jde" % "1.0",
-      "io.github.scalahub" %% "easyweb" % "1.1",
+      "io.github.scalahub" %% "easyweb" % "1.2",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
     ),
     updateOptions := updateOptions.value.withLatestSnapshots(false),
