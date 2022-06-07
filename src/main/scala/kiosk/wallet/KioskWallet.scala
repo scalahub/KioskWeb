@@ -123,16 +123,14 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
 
   private val compiler = new TxBuilder(explorer)
 
-  def txBuilder(
-      script: Text,
-      additionalSecrets: Array[String],
-      broadcast: Boolean
-  ) = {
+  def txBuilder(jdeScript: Text, additionalSecrets: Array[String], broadcast: Boolean) = {
+    println("JAVA " + System.getProperty("java.runtime.version"))
+
     val $INFO$ =
       """This creates a transaction using the script specified in TxBuilder. 
+TxBuilder is built on top of JDE (https://github.com/ergoplatform/ergo-jde). 
 If there are any lacking Ergs or tokens in the inputs, the wallet will attempt to add its own unspent boxes. 
-If some of the inputs need additional (proveDlog) secrets, they should be added to Env (as BigInts) and referenced in additionalSecrets.
-The wallet does not currently support proveDlog secrets."""
+If some of the inputs need additional (proveDlog) secrets, they should be added to Env (as BigInts) and referenced in additionalSecrets."""
 
     val $broadcast$ = "false"
 
@@ -152,7 +150,7 @@ The wallet does not currently support proveDlog secrets."""
         )
     }
 
-    val compileResults = compiler.compile(Parser.parse(script.getText))
+    val compileResults = compiler.compile(Parser.parse(jdeScript.getText))
     val txJson: JsValue = if (compileResults.outputs.nonEmpty) {
       try {
         val feeNanoErgs = compileResults.fee.getOrElse(defaultFee)

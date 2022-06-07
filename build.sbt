@@ -2,6 +2,8 @@ name := "KioskWeb"
 
 scalaVersion := "2.12.10"
 
+// resolvers += Resolver.mavenLocal
+
 lazy val root = (project in file("."))
   .settings(
     resolvers ++= Seq(
@@ -13,7 +15,7 @@ lazy val root = (project in file("."))
     ),
     libraryDependencies ++= Seq(
       "io.github.ergoplatform" %% "jde" % "1.0",
-      "io.github.scalahub" %% "easyweb" % "1.0", // EasyWeb
+      "io.github.scalahub" %% "easyweb" % "1.1",
       "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3"
     ),
     updateOptions := updateOptions.value.withLatestSnapshots(false),
