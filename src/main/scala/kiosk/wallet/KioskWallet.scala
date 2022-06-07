@@ -130,9 +130,56 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
       """This creates a transaction using the script specified in TxBuilder. 
 TxBuilder is built on top of JDE (https://github.com/ergoplatform/ergo-jde). 
 If there are any lacking Ergs or tokens in the inputs, the wallet will attempt to add its own unspent boxes. 
+The default script obtains the Erg-USD rate from the Oracle Pool.
+
 If some of the inputs need additional (proveDlog) secrets, they should be added to Env (as BigInts) and referenced in additionalSecrets."""
 
     val $broadcast$ = "false"
+
+    val $jdeScript$ =
+      """{
+  "constants": [
+    {
+      "name": "oraclePoolNFT",
+      "type": "CollByte",
+      "value": "011d3364de07e5a26f0c4eef0852cddb387039a921b7154ef3cab22c6eda887f"
+    },
+    {
+      "name": "poolAddresses",
+      "type": "Address",
+      "values": [
+        "NTkuk55NdwCXkF1e2nCABxq7bHjtinX3wH13zYPZ6qYT71dCoZBe1gZkh9FAr7GeHo2EpFoibzpNQmoi89atUjKRrhZEYrTapdtXrWU4kq319oY7BEWmtmRU9cMohX69XMuxJjJP5hRM8WQLfFnffbjshhEP3ck9CKVEkFRw1JDYkqVke2JVqoMED5yxLVkScbBUiJJLWq9BSbE1JJmmreNVskmWNxWE6V7ksKPxFMoqh1SVePh3UWAaBgGQRZ7TWf4dTBF5KMVHmRXzmQqEu2Fz2yeSLy23sM3pfqa78VuvoFHnTFXYFFxn3DNttxwq3EU3Zv25SmgrWjLKiZjFcEcqGgH6DJ9FZ1DfucVtTXwyDJutY3ksUBaEStRxoUQyRu4EhDobixL3PUWRcxaRJ8JKA9b64ALErGepRHkAoVmS8DaE6VbroskyMuhkTo7LbrzhTyJbqKurEzoEfhYxus7bMpLTePgKcktgRRyB7MjVxjSpxWzZedvzbjzZaHLZLkWZESk1WtdM25My33wtVLNXiTvficEUbjA23sNd24pv1YQ72nY1aqUHa2",
+        "EfS5abyDe4vKFrJ48K5HnwTqa1ksn238bWFPe84bzVvCGvK1h2B7sgWLETtQuWwzVdBaoRZ1HcyzddrxLcsoM5YEy4UnqcLqMU1MDca1kLw9xbazAM6Awo9y6UVWTkQcS97mYkhkmx2Tewg3JntMgzfLWz5mACiEJEv7potayvk6awmLWS36sJMfXWgnEfNiqTyXNiPzt466cgot3GLcEsYXxKzLXyJ9EfvXpjzC2abTMzVSf1e17BHre4zZvDoAeTqr4igV3ubv2PtJjntvF2ibrDLmwwAyANEhw1yt8C8fCidkf3MAoPE6T53hX3Eb2mp3Xofmtrn4qVgmhNonnV8ekWZWvBTxYiNP8Vu5nc6RMDBv7P1c5rRc3tnDMRh2dUcDD7USyoB9YcvioMfAZGMNfLjWqgYu9Ygw2FokGBPThyWrKQ5nkLJvief1eQJg4wZXKdXWAR7VxwNftdZjPCHcmwn6ByRHZo9kb4Emv3rjfZE"
+      ]
+    }
+  ],
+  "auxInputs": [
+    {
+      "address": {
+        "value": "poolAddresses"
+      },
+      "tokens": [
+        { 
+          "index": 0,
+          "id": {
+             "value": "oraclePoolNFT" 
+          }
+        }
+      ],
+      "registers": [
+        {
+          "num": "R4",
+          "name": "rateUsd",
+          "type": "Long"
+        }
+      ]
+    }
+  ],
+  "returns": [
+    "rateUsd"
+  ]
+}
+"""
 
     val envMap = $ergoBox.$ergoScript.$env.$envMap
     val additionalBigIntSecrets = additionalSecrets.map { additionalSecret =>
