@@ -109,8 +109,7 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
     }
     val index: Int = unspentBoxSums
       .find {
-        case (i, before, after) =>
-          before < totalNanoErgsNeeded && totalNanoErgsNeeded <= after
+        case (i, before, after) => before < totalNanoErgsNeeded && totalNanoErgsNeeded <= after
       }
       .getOrElse(
         throw new Exception(
@@ -124,7 +123,6 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
   private val compiler = new TxBuilder(explorer)
 
   def txBuilder(jdeScript: Text, additionalSecrets: Array[String], broadcast: Boolean) = {
-    println("JAVA " + System.getProperty("java.runtime.version"))
 
     val $INFO$ =
       """This creates a transaction using the script specified in TxBuilder. 
