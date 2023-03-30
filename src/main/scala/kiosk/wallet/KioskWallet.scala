@@ -23,8 +23,7 @@ class KioskWallet(val $ergoBox: KioskBoxCreator) extends EasyMirrorSession {
 
   val secretKey: BigInt = BigInt(
     Blake2b256(
-      $ergoBox.$ergoScript.$env.$sessionSecret.getOrElse("none")
-        .getBytes("UTF-16")
+      $ergoBox.$ergoScript.$env.$sessionSecret.getOrElse("none").getBytes("UTF-16")
     )
   )
   private val defaultGenerator: GroupElement =
